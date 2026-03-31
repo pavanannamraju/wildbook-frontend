@@ -1,4 +1,5 @@
 import BackgroundImage from "../assets/Frame 46.png";
+import { Link } from "react-router-dom";
 
 export function AboutUs() {
   return (
@@ -24,8 +25,8 @@ export function AboutUs() {
             <p className="font-['Cocogoose Pro',Helvetica] text-[#f9f9f9] text-4xl font-semibold leading-tight">
             by bringing structure, credibility, and intent to wildlife tourism in India.
             </p>
-            <a
-              href="#"
+            <Link
+              to="/about"
               className="inline-flex items-center gap-2 text-[#EDE8E2] border border-[#E2DDD8] rounded px-4 py-2 w-fit"
             >
               Know our journey
@@ -39,7 +40,7 @@ export function AboutUs() {
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-            </a>
+            </Link>
           </div>
           <p className="w-full lg:w-[60%] text-[#E8E2DC] text-base md:text-lg leading-relaxed">
             We bring together a trusted network of guides, naturalists, and

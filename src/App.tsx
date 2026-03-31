@@ -1,30 +1,40 @@
-import { useRef } from "react";
 import "./index.css";
-import { Hero } from "./components/Hero";
-import { StickyHeader } from "./components/StickyHeader";
-import { WhatWeDo } from "./components/WhatWeDo";
-import { AboutUs } from "./components/AboutUs";
-import { ResponsibleTourism } from "./components/ResponsibleTourism";
-import { Team } from "./components/Team";
-import { Footer } from "./components/Footer";
-import { useScrollPastRef } from "./hooks/useScrollPastRef";
+import { Route, Routes } from "react-router-dom";
+import { RootLayout } from "./layouts/RootLayout.tsx";
+import { HomePage } from "./pages/HomePage.tsx";
+import { ExploreExpertsPage } from "./pages/ExploreExpertsPage.tsx";
+import { SharedSafarisPage } from "./pages/SharedSafarisPage.tsx";
+import { DiscoverPackagesPage } from "./pages/DiscoverPackagesPage.tsx";
+import { AboutUsPage } from "./pages/AboutUsPage.tsx";
+import { ResponsiblePage } from "./pages/ResponsiblePage.tsx";
+import { WildlifeCodePage } from "./pages/WildlifeCodePage.tsx";
+import { FaqsPage } from "./pages/FaqsPage.tsx";
+import { PrivacyPage } from "./pages/PrivacyPage.tsx";
+import { TermsPage } from "./pages/TermsPage.tsx";
+import { FeedbackPage } from "./pages/FeedbackPage.tsx";
+import { ContactPage } from "./pages/ContactPage.tsx";
+import { LoginPage } from "./pages/LoginPage.tsx";
+import { NotFoundPage } from "./pages/NotFoundPage.tsx";
 
 export default function App() {
-  const heroRef = useRef<HTMLElement>(null);
-  const isPastHero = useScrollPastRef(heroRef);
-
   return (
-    <div className="min-h-screen bg-wildbook-bg">
-      <StickyHeader visible={isPastHero} />
-
-      <main>
-        <Hero ref={heroRef} />
-        <WhatWeDo />
-        <AboutUs />
-        <ResponsibleTourism />
-        <Team />
-        <Footer />
-      </main>
-    </div>
+    <Routes>
+      <Route element={<RootLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/experts" element={<ExploreExpertsPage />} />
+        <Route path="/safaris" element={<SharedSafarisPage />} />
+        <Route path="/packages" element={<DiscoverPackagesPage />} />
+        <Route path="/about" element={<AboutUsPage />} />
+        <Route path="/responsible" element={<ResponsiblePage />} />
+        <Route path="/wildlife-code" element={<WildlifeCodePage />} />
+        <Route path="/faqs" element={<FaqsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
   );
 }

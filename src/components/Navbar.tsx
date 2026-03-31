@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { GlassCard } from "react-glass-ui";
+import { Link, NavLink } from "react-router-dom";
 import logoDark from "../assets/Logo Dark.png";
 import logoLight from "../assets/Wildbook_light.svg";
 
 const NAV_LINKS = [
-  { label: "Home", href: "#", active: true },
-  { label: "Explore Guides", href: "#experts", active: false },
-  { label: "Shared Safaris", href: "#safaris", active: false },
-  { label: "Wildbook Tours", href: "#tours", active: false },
+  { label: "Home", to: "/" },
+  { label: "Explore Experts", to: "/experts" },
+  { label: "Shared Safaris", to: "/safaris" },
+  { label: "Discover Packages", to: "/packages" },
 ] as const;
 
 export type NavbarVariant = "light" | "dark";
@@ -21,7 +22,7 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
   const isLight = variant === "light";
 
   const linkClasses = (active: boolean) =>
-    `block  px-5 py-2.5 text-sm font-medium transition-colors ${
+    `block px-5 py-2.5 text-sm font-medium transition-colors ${
       active
         ? "bg-(--color-wildbook-teal) text-(--color-wildbook-cream)"
         : isLight
@@ -40,46 +41,49 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
       >
         <div className="flex w-full items-center justify-between gap-4 px-4">
           {/* Logo */}
-          <a
-            href="/"
-            className="flex shrink-0 items-center"
-            aria-label="Wildbook home"
-          >
+          <Link to="/" className="flex shrink-0 items-center" aria-label="Wildbook home">
             <img
               src={isLight ? logoDark : logoLight}
               alt="Wildbook"
               className="h-4 w-auto min-[1000px]:h-6"
             />
-          </a>
+          </Link>
 
           {/* Navigation links - desktop at 1000px+ */}
           <ul className="hidden items-center justify-center gap-1 min-[1000px]:flex min-[1000px]:gap-2">
             {NAV_LINKS.map((link) => (
               <li key={link.label}>
-                <a
-                  href={link.href}
-                  className={`rounded px-5 py-2 text-sm font-medium transition-colors min-[1000px]:px-6 min-[1000px]:py-2 ${
-                    link.active
-                      ? "bg-(--color-wildbook-teal) text-(--color-wildbook-cream)"
-                      : isLight
-                        ? "text-(--color-wildbook-cream) hover:bg-white/10"
-                        : "text-black hover:bg-black/10"
-                  }`}
+                <NavLink
+                  to={link.to}
+                  end={link.to === "/"}
+                  className={({ isActive }) =>
+                    `rounded px-5 py-2 text-sm font-medium transition-colors min-[1000px]:px-6 min-[1000px]:py-2 ${
+                      isActive
+                        ? "bg-(--color-wildbook-teal) text-(--color-wildbook-cream)"
+                        : isLight
+                          ? "text-(--color-wildbook-cream) hover:bg-white/10"
+                          : "text-black hover:bg-black/10"
+                    }`
+                  }
                 >
                   {link.label}
-                </a>
+                </NavLink>
               </li>
             ))}
           </ul>
 
           {/* Desktop Login - visible at 1000px+ */}
-          <a
-            href="#login"
-            className={`hidden shrink-0 rounded px-6 py-2 text-sm font-medium min-[1000px]:inline-flex min-[1000px]:items-center min-[1000px]:gap-2 ${
-              isLight
-                ? "text-(--color-wildbook-cream) hover:bg-white/10"
-                : "text-black hover:bg-black/10"
-            }`}
+          <NavLink
+            to="/login"
+            className={({ isActive }) =>
+              `hidden shrink-0 rounded px-6 py-2 text-sm font-medium min-[1000px]:inline-flex min-[1000px]:items-center min-[1000px]:gap-2 ${
+                isActive
+                  ? "bg-(--color-wildbook-teal) text-(--color-wildbook-cream)"
+                  : isLight
+                    ? "text-(--color-wildbook-cream) hover:bg-white/10"
+                    : "text-black hover:bg-black/10"
+              }`
+            }
           >
             <svg
               width="20"
@@ -93,7 +97,7 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
               <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" />
             </svg>
             Login
-          </a>
+          </NavLink>
 
           {/* Hamburger button - below 1000px */}
           <button
@@ -129,26 +133,31 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
         >
           <div className="flex flex-col gap-1 border-t border-black/10 py-4 px-4">
             {NAV_LINKS.map((link) => (
-              <a
+              <NavLink
                 key={link.label}
-                href={link.href}
-                className={linkClasses(link.active)}
+                to={link.to}
+                end={link.to === "/"}
+                className={({ isActive }) => linkClasses(isActive)}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
-              </a>
+              </NavLink>
             ))}
-            <a
-              href="#login"
-              className={`mt-2 rounded px-6 py-2.5 text-center text-sm font-medium ${
-                isLight
-                  ? "text-(--color-wildbook-cream) hover:bg-white/10"
-                  : "text-black hover:bg-black/10"
-              }`}
+            <NavLink
+              to="/login"
+              className={({ isActive }) =>
+                `mt-2 rounded px-6 py-2.5 text-center text-sm font-medium ${
+                  isActive
+                    ? "bg-(--color-wildbook-teal) text-(--color-wildbook-cream)"
+                    : isLight
+                      ? "text-(--color-wildbook-cream) hover:bg-white/10"
+                      : "text-black hover:bg-black/10"
+                }`
+              }
               onClick={() => setMobileMenuOpen(false)}
             >
               Login
-            </a>
+            </NavLink>
           </div>
         </div>
       </GlassCard>
