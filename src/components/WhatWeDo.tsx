@@ -36,7 +36,7 @@ const tabs = [
     buttonDisabled: false,
   },
   {
-    title: "Wild Life Packages",
+    title: "Wildlife Packages",
     heading: "Thoughtfully crafted journeys, ready when you are.",
     description:
       "Choose curated wildlife packages that combine locations, stays, and expert-led experiences into one coherent trip.",
