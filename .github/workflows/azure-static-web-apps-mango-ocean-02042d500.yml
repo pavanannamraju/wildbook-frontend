@@ -14,6 +14,12 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+    # Required for `build.ts` to emit `build/public-config` (no Bun server on Static Web Apps).
+    env:
+      BUN_PUBLIC_FIREBASE_API_KEY: ${{ secrets.BUN_PUBLIC_FIREBASE_API_KEY }}
+      BUN_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.BUN_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+      BUN_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.BUN_PUBLIC_FIREBASE_PROJECT_ID }}
+      BUN_PUBLIC_FIREBASE_APP_ID: ${{ secrets.BUN_PUBLIC_FIREBASE_APP_ID }}
     steps:
       - uses: actions/checkout@v3
         with:
