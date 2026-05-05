@@ -13,7 +13,7 @@ export function HomePage() {
   const isPastHero = useScrollPastRef(heroRef);
 
   return (
-    <>
+    <div className="bg-[#f6f4f0]">
       <StickyHeader visible={isPastHero} />
       <main>
         <Hero ref={heroRef} />
@@ -23,7 +23,7 @@ export function HomePage() {
         <Team />
         <MapSection />
       </main>
-    </>
+    </div>
   );
 }
 

@@ -9,6 +9,7 @@ import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 
 import type { MapsDataDocument } from "../api/mapsData";
 import { useMapsData } from "../hooks/useMapsData";
+import { PageLoader } from "./PageLoader";
 
 type LatLng = readonly [number, number];
 
@@ -250,11 +251,7 @@ export function MapSection() {
       </div>
 
       <div className="mt-6">
-        {status === "loading" && (
-          <div className="rounded-2xl border border-black/10 bg-white/30 px-4 py-3 text-wildbook-muted">
-            Loading sites…
-          </div>
-        )}
+        {status === "loading" && <PageLoader />}
         {status === "error" && (
           <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-red-900">
             {error}

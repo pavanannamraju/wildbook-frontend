@@ -1,3 +1,5 @@
+import { apiFetch } from "./client";
+
 export type MongoOid = {
   $oid: string;
 };
@@ -83,7 +85,7 @@ export function parseMapsDataResponse(payload: unknown): MapsDataDocument[] {
 }
 
 export async function fetchMapsData(signal?: AbortSignal): Promise<MapsDataDocument[]> {
-  const response = await fetch("/api/v1/maps-data", { signal });
+  const response = await apiFetch("/api/v1/maps-data", { signal });
   if (!response.ok) {
     let detail: string | null = null;
     try {

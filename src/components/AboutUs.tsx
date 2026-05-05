@@ -1,4 +1,5 @@
 import BackgroundImage from "../assets/Frame 46.png";
+import { ArrowRight as ArrowRightIcon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 
 export function AboutUs() {
@@ -30,16 +31,7 @@ export function AboutUs() {
               className="inline-flex items-center gap-2 text-[#EDE8E2] border border-[#E2DDD8] rounded px-4 py-2 w-fit"
             >
               Know our journey
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+              <ArrowRightIcon size={20} />
             </Link>
           </div>
           <p className="w-full lg:w-[60%] text-[#E8E2DC] text-base md:text-lg leading-relaxed">

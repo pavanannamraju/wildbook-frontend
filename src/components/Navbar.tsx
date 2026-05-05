@@ -1,8 +1,21 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { GlassCard } from "react-glass-ui";
+import {
+  ArrowRightIcon,
+  BookmarkSimpleIcon,
+  CircleIcon,
+  GearIcon,
+  ImageSquareIcon,
+  QuestionIcon,
+  SignOutIcon,
+  UserCircleIcon,
+} from "@phosphor-icons/react";
+import { createPortal } from "react-dom";
 import { Link, NavLink } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
 import logoDark from "../assets/Logo Dark.png";
 import logoLight from "../assets/Wildbook_light.svg";
+import { LoginModalContent } from "./auth/LoginModalContent";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
@@ -17,10 +30,85 @@ interface NavbarProps {
   variant?: NavbarVariant;
 }
 
+type ProfileMenuItem = {
+  label: string;
+  icon: React.ComponentType<{ size?: string | number; className?: string }>;
+};
+
+const PROFILE_MENU_ITEMS: ReadonlyArray<ProfileMenuItem> = [
+  { label: "My Profile", icon: UserCircleIcon },
+  { label: "My Bookings", icon: CircleIcon },
+  { label: "Bookmarks", icon: BookmarkSimpleIcon },
+  { label: "My Gallery", icon: ImageSquareIcon },
+  { label: "Settings", icon: GearIcon },
+  { label: "FAQs", icon: QuestionIcon },
+];
+
 export default function Navbar({ variant = "light" }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [profileMenuPosition, setProfileMenuPosition] = useState({ top: 0, left: 0 });
+  const { user, logout } = useAuth();
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
+  const profileTriggerRef = useRef<HTMLButtonElement | null>(null);
   const isLight = variant === "light";
+  const userInitial = useMemo(
+    () => user?.displayName?.trim().charAt(0).toUpperCase() || "U",
+    [user?.displayName],
+  );
+  const userDisplayName = user?.displayName?.trim() || "Wildbook User";
+  const userEmail = user?.email?.trim() || "";
 
+  useEffect(() => {
+    if (!profileMenuOpen) {
+      return;
+    }
+
+    const updateMenuPosition = () => {
+      const triggerRect = profileTriggerRef.current?.getBoundingClientRect();
+      if (!triggerRect) {
+        return;
+      }
+
+      const menuWidth = 300;
+      const menuTop = triggerRect.bottom + 12;
+      const menuLeft = Math.max(16, Math.min(window.innerWidth - menuWidth - 16, triggerRect.right - menuWidth));
+      setProfileMenuPosition({ top: menuTop, left: menuLeft });
+    };
+
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+      const clickInsideMenu = profileMenuRef.current?.contains(target);
+      const clickOnTrigger = profileTriggerRef.current?.contains(target);
+      if (!clickInsideMenu && !clickOnTrigger) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    updateMenuPosition();
+    window.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("keydown", onEscape);
+    window.addEventListener("resize", updateMenuPosition);
+    window.addEventListener("scroll", updateMenuPosition, true);
+
+    return () => {
+      window.removeEventListener("mousedown", onPointerDown);
+      window.removeEventListener("keydown", onEscape);
+      window.removeEventListener("resize", updateMenuPosition);
+      window.removeEventListener("scroll", updateMenuPosition, true);
+    };
+  }, [profileMenuOpen]);
+  
   const linkClasses = (active: boolean) =>
     `block px-5 py-2.5 text-sm font-medium transition-colors ${
       active
@@ -31,15 +119,18 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
     }`;
 
   return (
-    <nav className="">
+    <>
+      <nav>
       <GlassCard
-        className="w-full!"
+        className={`w-full! overflow-visible! ${isLight ? "" : "bg-transparent!"}`}
         borderRadius={0}
-        blur={10}
-        brightness={isLight ? 100 : 110}
+        blur={isLight ? 10 : 10}
+        brightness={isLight ? 75 : 90}
         borderColor="transparent"
+        backgroundOpacity={isLight ? 0 : 0.4}
+        backgroundColor={isLight ? "#00000000" : "#f3eee9"}
       >
-        <div className="flex w-full items-center justify-between gap-4 px-4">
+        <div className="flex w-full items-center justify-between gap-4 px-[88px]">
           {/* Logo */}
           <Link to="/" className="flex shrink-0 items-center" aria-label="Wildbook home">
             <img
@@ -73,31 +164,39 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
           </ul>
 
           {/* Desktop Login - visible at 1000px+ */}
-          <NavLink
-            to="/login"
-            className={({ isActive }) =>
-              `hidden shrink-0 rounded px-6 py-2 text-sm font-medium min-[1000px]:inline-flex min-[1000px]:items-center min-[1000px]:gap-2 ${
-                isActive
-                  ? "bg-(--color-wildbook-teal) text-(--color-wildbook-cream)"
-                  : isLight
+          {user ? (
+            <div className="hidden shrink-0 min-[1000px]:block">
+              <button
+                ref={profileTriggerRef}
+                type="button"
+                onClick={() => setProfileMenuOpen((open) => !open)}
+                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  isLight
                     ? "text-(--color-wildbook-cream) hover:bg-white/10"
-                    : "text-black hover:bg-black/10"
-              }`
-            }
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
+                    : "bg-(--color-wildbook-teal) text-(--color-wildbook-cream) hover:brightness-95"
+                }`}
+                aria-label="Open account menu"
+                aria-expanded={profileMenuOpen}
+                aria-haspopup="menu"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-black/10 text-xs font-semibold">
+                  {userInitial}
+                </span>
+                <span className="max-w-32 truncate">{userDisplayName.split(" ")[0]}</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className={`hidden shrink-0 rounded px-6 py-2 text-sm font-medium min-[1000px]:inline-flex min-[1000px]:items-center min-[1000px]:gap-2 ${
+                isLight ? "text-(--color-wildbook-cream) hover:bg-white/10" : "text-black hover:bg-black/10"
+              }`}
+              onClick={() => setLoginModalOpen(true)}
             >
-              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" />
-            </svg>
-            Login
-          </NavLink>
+              <UserCircleIcon size={20} aria-hidden="true" />
+              Login
+            </button>
+          )}
 
           {/* Hamburger button - below 1000px */}
           <button
@@ -143,24 +242,111 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
                 {link.label}
               </NavLink>
             ))}
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                `mt-2 rounded px-6 py-2.5 text-center text-sm font-medium ${
-                  isActive
-                    ? "bg-(--color-wildbook-teal) text-(--color-wildbook-cream)"
-                    : isLight
-                      ? "text-(--color-wildbook-cream) hover:bg-white/10"
-                      : "text-black hover:bg-black/10"
-                }`
-              }
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Login
-            </NavLink>
+            {user ? (
+              <button
+                type="button"
+                className={`mt-2 rounded px-6 py-2.5 text-center text-sm font-medium ${
+                  isLight
+                    ? "text-(--color-wildbook-cream) hover:bg-white/10"
+                    : "text-black hover:bg-black/10"
+                }`}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  void logout();
+                }}
+              >
+                <span className="inline-flex items-center justify-center gap-2">
+                  <ArrowRightIcon size={16} aria-hidden="true" />
+                  Logout
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className={`mt-2 rounded px-6 py-2.5 text-center text-sm font-medium ${
+                  isLight ? "text-(--color-wildbook-cream) hover:bg-white/10" : "text-black hover:bg-black/10"
+                }`}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setLoginModalOpen(true);
+                }}
+              >
+                Login
+              </button>
+            )}
           </div>
         </div>
       </GlassCard>
-    </nav>
+      </nav>
+      {profileMenuOpen && user
+        ? createPortal(
+            <div
+              ref={profileMenuRef}
+              className="fixed z-1000 w-[300px] rounded-3xl border border-black/10 bg-[#F7F6F2] p-5 text-[#1f1f1f] shadow-xl"
+              style={{
+                top: profileMenuPosition.top,
+                left: profileMenuPosition.left,
+              }}
+            >
+              <div className="flex items-start gap-3 border-b border-black/20 pb-3">
+                <span className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#D8D8D8] text-base font-semibold text-[#2a2a2a]">
+                  {userInitial}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm leading-tight font-semibold">{userDisplayName}</p>
+                  {userEmail ? (
+                    <p className="truncate pt-1 text-sm leading-tight text-[#0f7c79]">{userEmail}</p>
+                  ) : null}
+                </div>
+              </div>
+
+              <ul className="space-y-1 py-4" role="menu" aria-label="Account menu options">
+                {PROFILE_MENU_ITEMS.map((item) => (
+                  <li key={item.label}>
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm text-[#2c2c2c] transition-colors hover:bg-black/5"
+                      role="menuitem"
+                    >
+                      <item.icon size={24} className="text-[#0f7c79]" />
+                      <span>{item.label}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="border-t border-black/20 pt-3">
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm text-[#D83A31] transition-colors hover:bg-[#D83A31]/10"
+                  role="menuitem"
+                  onClick={() => {
+                    setProfileMenuOpen(false);
+                    void logout();
+                  }}
+                >
+                  <SignOutIcon size={24} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+      {loginModalOpen
+        ? createPortal(
+            <div className="fixed inset-0 z-1200 flex items-center justify-center bg-black/50 p-4">
+              <div className="absolute inset-0" onClick={() => setLoginModalOpen(false)} />
+              <div className="relative z-1 w-full max-w-[1120px]">
+                <LoginModalContent
+                  onClose={() => setLoginModalOpen(false)}
+                  onSuccess={() => setLoginModalOpen(false)}
+                />
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+    </>
   );
 }

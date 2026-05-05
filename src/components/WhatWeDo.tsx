@@ -3,6 +3,7 @@ import GuideConnectImage from "../assets/GuideConnect.png";
 import SharedSafarisImage from "../assets/SharedSafaris.png";
 import WildLifePackagesImage from "../assets/WildLifePackages.png";
 import { useNavigate } from "react-router-dom";
+import { ArrowRightIcon } from "@phosphor-icons/react";
 
 const tabs = [
   {
@@ -68,28 +69,26 @@ export function WhatWeDo() {
 
   return (
     <section className="relative pt-10 page-px max-w-[1920px] mx-auto">
-      <div className="mb-8 relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+      <div className="mb-4 relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
         <div className="max-w-[760px]">
-          <h2 className="text-[20px] font-medium text-[#AB8640] mb-2">
+          <h2 className="text-[22px] font-medium text-[#AB8640]">
             Our Offerings
           </h2>
-          <p className="text-[24px] leading-tight text-[#2F2B28]">
+          <p className="text-[24px] leading-tight font-medium text-[#2F2B28]">
             With the wild so complex, exploring it should feel simple
           </p>
         </div>
       </div>
 
-      <div className="relative flex flex-col lg:flex-row gap-6">
-        <div className="w-full lg:w-1/2 rounded-2xl flex justify-center items-center">
+      <div className="relative flex flex-col lg:flex-row gap-8">
           <img
             src={activeTab.image}
             alt={activeTab.title}
             className="max-w-[800px] w-full h-auto object-contain rounded-2xl"
             style={{ aspectRatio: "800/512" }}
           />
-        </div>
 
-        <div className="w-full lg:w-1/2 rounded-2xl bg-[#E8E2DC] px-2 py-4 flex flex-col gap-4">
+        <div className="w-full lg:w-1/2 rounded-2xl bg-[#f3eee9] px-6 py-4 flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {tabs.map((tab) => {
               const isActive = tab.title === activeTab.title;
@@ -111,14 +110,13 @@ export function WhatWeDo() {
           </div>
 
           <div className="flex flex-col gap-8">
-            <h3 className="text-3xl px-1 font-semibold text-[#0B6E66] leading-tight">
+            <h3 className="text-3xl font-semibold pt-4 text-[#0B6E66] leading-tight">
               {activeTab.heading}
             </h3>
             {/* <p className="text-[#73706C] text-base lg:text-lg">
               {activeTab.description}
             </p> */}
-            <ul style={{ listStyleType: "circle" }} className="pl-5 space-y-1">
-              {" "}
+            <ul style={{ listStyleType: "circle" }} className="pl-5 space-y-4">
               {activeTab.highlights.map((highlight) => (
                 <li key={highlight} className="text-[#2F2B28] text-md">
                   <div className="flex items-start gap-3 font-extralight">
@@ -135,16 +133,7 @@ export function WhatWeDo() {
             className="inline-flex items-center text-[12px] gap-2 text-[#2F2B28] border border-[#3B372F] rounded px-6 mt-auto py-1 w-fit"
           >
             {activeTab.buttonText}
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <ArrowRightIcon size={20} />
           </button>
         </div>
       </div>
