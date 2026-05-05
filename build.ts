@@ -2,7 +2,7 @@ import tailwindcss from "bun-plugin-tailwind";
 
 await Bun.build({
   entrypoints: ["./src/index.html"],
-  outdir: "./dist",
+  outdir: "./build",
   sourcemap: "external",
   target: "browser",
   minify: true,
