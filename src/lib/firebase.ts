@@ -11,21 +11,26 @@ type FirebaseConfig = {
 declare global {
   interface Window {
     __WILDBOOK_CONFIG__?: {
-      firebase?: Partial<FirebaseConfig>;
+      publicEnv?: Record<string, string>;
     };
   }
 }
 
+function readRequiredPublicEnv(name: string): string {
+  const value = window.__WILDBOOK_CONFIG__?.publicEnv?.[name]?.trim();
+  if (!value) {
+    throw new Error(`Missing frontend runtime config: ${name}`);
+  }
+  return value;
+}
+
 function readFirebaseConfig(): FirebaseConfig {
-  const config = window.__WILDBOOK_CONFIG__?.firebase;
-  if (!config) {
-    throw new Error("Missing frontend firebase config.");
-  }
-  const { apiKey, authDomain, projectId, appId } = config;
-  if (!apiKey || !authDomain || !projectId || !appId) {
-    throw new Error("Incomplete frontend firebase config.");
-  }
-  return { apiKey, authDomain, projectId, appId };
+  return {
+    apiKey: readRequiredPublicEnv("BUN_PUBLIC_FIREBASE_API_KEY"),
+    authDomain: readRequiredPublicEnv("BUN_PUBLIC_FIREBASE_AUTH_DOMAIN"),
+    projectId: readRequiredPublicEnv("BUN_PUBLIC_FIREBASE_PROJECT_ID"),
+    appId: readRequiredPublicEnv("BUN_PUBLIC_FIREBASE_APP_ID"),
+  };
 }
 
 const firebaseConfig = readFirebaseConfig();

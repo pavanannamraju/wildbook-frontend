@@ -14,8 +14,10 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
-    # Required for `build.ts` to emit `build/public-config` (no Bun server on Static Web Apps).
+    # Build-time values used to generate `build/public-config` for static hosting.
     env:
+      BUN_PUBLIC_CONFIG_JSON: ${{ secrets.BUN_PUBLIC_CONFIG_JSON }}
+      BUN_PUBLIC_BACKEND_ORIGIN: ${{ secrets.BUN_PUBLIC_BACKEND_ORIGIN }}
       BUN_PUBLIC_FIREBASE_API_KEY: ${{ secrets.BUN_PUBLIC_FIREBASE_API_KEY }}
       BUN_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.BUN_PUBLIC_FIREBASE_AUTH_DOMAIN }}
       BUN_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.BUN_PUBLIC_FIREBASE_PROJECT_ID }}

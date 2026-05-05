@@ -2,15 +2,39 @@ import tailwindcss from "bun-plugin-tailwind";
 
 const outdir = "./build";
 
-function requiredEnv(name: string): string {
-  const value = process.env[name]?.trim();
-  if (!value) {
-    throw new Error(
-      `Missing ${name}. Static hosting has no server for /public-config; ` +
-        `this value must be present when running \`bun run build\` (e.g. in CI).`,
-    );
+function collectPublicEnv(): Record<string, string> {
+  const publicEnv: Record<string, string> = {};
+
+  for (const [key, rawValue] of Object.entries(process.env)) {
+    if (!key.startsWith("BUN_PUBLIC_")) continue;
+    const value = rawValue?.trim();
+    if (value) {
+      publicEnv[key] = value;
+    }
   }
-  return value;
+
+  const jsonConfig = process.env.BUN_PUBLIC_CONFIG_JSON?.trim();
+  if (jsonConfig) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(jsonConfig);
+    } catch (error) {
+      throw new Error(`BUN_PUBLIC_CONFIG_JSON is not valid JSON: ${String(error)}`);
+    }
+
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      throw new Error("BUN_PUBLIC_CONFIG_JSON must be a JSON object.");
+    }
+
+    for (const [key, value] of Object.entries(parsed)) {
+      if (!key.startsWith("BUN_PUBLIC_")) continue;
+      if (typeof value === "string" && value.trim()) {
+        publicEnv[key] = value.trim();
+      }
+    }
+  }
+
+  return publicEnv;
 }
 
 await Bun.build({
@@ -27,13 +51,8 @@ await Bun.build({
 });
 
 // Azure Static Web Apps (and other static hosts) do not run `src/index.ts`; the browser
-// still fetches `/public-config`, so emit the same JSON the dev server serves.
+// still fetches `/public-config`, so emit runtime config for browser code.
 const publicConfig = {
-  firebase: {
-    apiKey: requiredEnv("BUN_PUBLIC_FIREBASE_API_KEY"),
-    authDomain: requiredEnv("BUN_PUBLIC_FIREBASE_AUTH_DOMAIN"),
-    projectId: requiredEnv("BUN_PUBLIC_FIREBASE_PROJECT_ID"),
-    appId: requiredEnv("BUN_PUBLIC_FIREBASE_APP_ID"),
-  },
+  publicEnv: collectPublicEnv(),
 };
 await Bun.write(`${outdir}/public-config`, JSON.stringify(publicConfig));

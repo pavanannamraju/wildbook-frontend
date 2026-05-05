@@ -10,6 +10,19 @@ type ApiFetchOptions = Omit<RequestInit, "headers"> & {
   headers?: Record<string, string>;
 };
 
+function resolveApiUrl(path: string): string {
+  const backendOrigin = window.__WILDBOOK_CONFIG__?.publicEnv?.BUN_PUBLIC_BACKEND_ORIGIN?.trim();
+  if (!backendOrigin) {
+    return path;
+  }
+
+  const normalizedOrigin = backendOrigin.endsWith("/")
+    ? backendOrigin.slice(0, -1)
+    : backendOrigin;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${normalizedOrigin}${normalizedPath}`;
+}
+
 export async function apiFetch(path: string, options: ApiFetchOptions = {}): Promise<Response> {
   const headers = new Headers(options.headers ?? {});
   const currentUser = firebaseAuth.currentUser;
@@ -19,7 +32,7 @@ export async function apiFetch(path: string, options: ApiFetchOptions = {}): Pro
     headers.set("Authorization", `Bearer ${idToken}`);
   }
 
-  const response = await fetch(path, {
+  const response = await fetch(resolveApiUrl(path), {
     ...options,
     headers,
   });

@@ -1,17 +1,10 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
-type FirebaseConfig = {
-  apiKey: string;
-  authDomain: string;
-  projectId: string;
-  appId: string;
-};
-
 declare global {
   interface Window {
     __WILDBOOK_CONFIG__?: {
-      firebase?: Partial<FirebaseConfig>;
+      publicEnv?: Record<string, string>;
     };
   }
 }
@@ -25,7 +18,7 @@ async function bootstrap() {
   }
 
   window.__WILDBOOK_CONFIG__ = (await response.json()) as {
-    firebase?: Partial<FirebaseConfig>;
+    publicEnv?: Record<string, string>;
   };
 
   const [{ default: App }, { AuthProvider }] = await Promise.all([
