@@ -1,0 +1,36 @@
+src/lib/firebase.ts
+  e90c900bd23123e0 14,19-22,24-33
+src/api/client.ts
+  e90c900bd23123e0 13-25,35
+build.ts
+  e90c900bd23123e0 5-13,15-37,54,56
+src/frontend.tsx
+  e90c900bd23123e0 7,21
+.github/workflows/azure-static-web-apps-mango-ocean-02042d500.yml
+  e90c900bd23123e0 17,19-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "17973e53ee0d3a3b36b053b75ad8e1dd9cc99e30",
+  "prompts": {
+    "e90c900bd23123e0": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e405ab37-973c-46cc-9b27-6656ea8cccb6",
+        "model": "default"
+      },
+      "human_author": "pavanannamraju",
+      "messages": [],
+      "total_additions": 79,
+      "total_deletions": 47,
+      "accepted_lines": 69,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_446882353cd13f": {
+      "author": "pavanannamraju"
+    }
+  }
+}
